@@ -6,15 +6,46 @@ import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
 import Settings from './pages/Settings'
 
+import ProtectedRoute
+  from './routes/ProtectedRoute'
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/settings" element={<Settings />} />
+
+        <Route 
+            path="/dashboard"
+
+         element={
+            <ProtectedRoute>
+            <Dashboard />
+            </ProtectedRoute>
+  }
+/>
+
+        <Route 
+          path="/users"
+
+         element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+   />
+
+        <Route
+           path="/settings"
+           
+         element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+   />
+
       </Routes>
     </BrowserRouter>
   )
