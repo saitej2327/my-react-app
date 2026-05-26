@@ -28,23 +28,21 @@ function App() {
 
         <Route 
           path="/users"
-
-         element={
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  }
-   />
+          element={
+            <ProtectedRoute>
+              <Users />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
-           path="/settings"
-           
-         element={
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  }
-   />
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
     </BrowserRouter>

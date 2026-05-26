@@ -1,26 +1,18 @@
-import { useState } from 'react'
-
-import { useEffect } from 'react'
-
-useEffect(() => {
-
-  const token =
-    localStorage.getItem('token')
-
-  if (token) {
-
-    navigate('/dashboard')
-  }
-
-}, [])
-
+import { useEffect, useState } from 'react'
 import axios from 'axios'
-
 import { useNavigate } from 'react-router-dom'
 
 function Login() {
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      navigate('/dashboard')
+    }
+  }, [navigate])
 
   // FORM STATE
   const [email, setEmail] = useState('')

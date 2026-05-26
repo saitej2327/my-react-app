@@ -1,7 +1,39 @@
+import { useState } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 export default function Register() {
   const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleRegister = async (event) => {
+    event.preventDefault()
+
+    if (!name || !email || !password) {
+      alert('Please fill in all fields')
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      await axios.post('http://localhost:5000/api/auth/register', {
+        email,
+        password
+      })
+
+      alert('Registration successful! You can now log in.')
+      navigate('/')
+    } catch (error) {
+      console.error(error)
+      alert(error?.response?.data?.message || 'Registration failed')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div
@@ -17,17 +49,14 @@ export default function Register() {
           <p className="text-muted">Create a new account to access the dashboard</p>
         </div>
 
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            navigate('/dashboard')
-          }}
-        >
+        <form onSubmit={handleRegister}>
           <div className="mb-3">
             <input
               type="text"
               className="form-control"
               placeholder="Full Name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
               required
             />
           </div>
@@ -37,6 +66,8 @@ export default function Register() {
               type="email"
               className="form-control"
               placeholder="Email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
           </div>
@@ -46,6 +77,8 @@ export default function Register() {
               type="password"
               className="form-control"
               placeholder="Password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               required
             />
           </div>
@@ -62,8 +95,12 @@ export default function Register() {
             </label>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Register
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Registering...' : 'Register'}
           </button>
         </form>
 
