@@ -1,9 +1,11 @@
+require('dotenv').config()
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const verifyToken = require('./middleware/verifyToken');
 
 const app = express();
 
@@ -11,14 +13,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api/users', userRoutes);
+// Routes (protect user routes)
+app.use('/api/users', verifyToken, userRoutes);
 app.use('/api/auth', authRoutes);
 
 // MongoDB Connection
-mongoose.connect(
-  "mongodb+srv://Saitej23:Katturi23@cluster0.k2kujdm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-)
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
   console.log("MongoDB Connected");
 })
@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 });
 
 // Server
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

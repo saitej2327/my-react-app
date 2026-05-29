@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 
 const AuthUser =
   require('../models/AuthUser')
+const verifyToken = require('../middleware/verifyToken')
 
 const router = express.Router()
 
@@ -17,18 +18,16 @@ router.post('/register', async (req, res) => {
 
   try {
 
-    const { email, password } = req.body
+    const { name, email, password } = req.body
 
     // HASH PASSWORD
     const hashedPassword =
       await bcrypt.hash(password, 10)
 
     const user = new AuthUser({
-
+      name,
       email,
-
       password: hashedPassword
-
     })
 
     await user.save()
@@ -79,20 +78,7 @@ router.post('/login', async (req, res) => {
     }
 
     // CREATE JWT TOKEN
-    const token =
-      jwt.sign(
-
-        {
-          userId: user._id
-        },
-
-        'SECRET_KEY',
-
-        {
-          expiresIn: '1d'
-        }
-
-      )
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
     res.json({
       token
@@ -107,3 +93,13 @@ router.post('/login', async (req, res) => {
 })
 
 module.exports = router
+
+// Get current authenticated user
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    const user = await AuthUser.findById(req.userId).select('-password')
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
