@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { login } from '../api/authService'
+import { setAuthToken } from '../api/authHelpers'
 
 function Login() {
 
@@ -22,24 +23,10 @@ function Login() {
   const handleLogin = async () => {
 
     try {
-
-      const response =
-        await axios.post(
-
-          'http://localhost:5000/api/auth/login',
-
-          {
-            email,
-            password
-          }
-
-        )
+      const response = await login({ email, password })
 
       // STORE TOKEN
-      localStorage.setItem(
-        'token',
-        response.data.token
-      )
+      setAuthToken(response.token)
 
       alert('Login Successful')
 

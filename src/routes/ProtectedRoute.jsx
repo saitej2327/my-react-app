@@ -1,10 +1,10 @@
 import { Navigate } from 'react-router-dom'
+import { getAuthToken } from '../api/authHelpers'
 
 function ProtectedRoute({ children }) {
 
   // GET TOKEN
-  const token =
-    localStorage.getItem('token')
+  const token = getAuthToken()
 
   // IF NO TOKEN
   if (!token) {
