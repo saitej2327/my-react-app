@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 
-import axios from 'axios'
-import { useEffect } from 'react'
+import apiClient from '../api/apiClient'
 
 import {
   FaEdit,
@@ -23,8 +22,9 @@ function Users() {
 
   const fetchUsers = async () => {
     try {
-      const response =
-        await axios.get('http://localhost:5000/api/users')
+      const response = await apiClient.get(
+        '/api/users'
+      )
       setUsers(response.data)
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -38,54 +38,45 @@ function Users() {
   const [editingId, setEditingId] = useState(null)
 
 
-  const addUser = () => {
-
+  const addUser = async () => {
     if (!name || !email) {
       alert('Please fill all fields')
       return
     }
 
-    const newUser = {
-      id: users.length + 1,
-      name,
-      email,
-      role
-    }
-
-    setUsers([...users, newUser])
-
-    
-    setName('')
-    setEmail('')
-    setRole('Employee')
-  }
-
-  
-  const deleteUser = async (id) => {
-
-  try {
-
-    await axios.delete(
-      `http://localhost:5000/api/users/${id}`
-    )
-
-    const filteredUsers =
-      users.filter(
-        (user) => user._id !== id
+    try {
+      const response = await apiClient.post(
+        '/api/users',
+        { name, email, role }
       )
 
-    setUsers(filteredUsers)
-
-  } catch (error) {
-
-    console.log(error)
+      setUsers([...users, response.data])
+      setName('')
+      setEmail('')
+      setRole('Employee')
+    } catch (error) {
+      console.error('Error adding user:', error)
+      alert('Failed to add user')
+    }
   }
-}
 
-  
+  const deleteUser = async (id) => {
+    try {
+      await apiClient.delete(
+        `/api/users/${id}`
+      )
+
+      const filteredUsers =
+        users.filter((user) => user._id !== id)
+
+      setUsers(filteredUsers)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const editUser = (user) => {
-
-    setEditingId(user.id)
+    setEditingId(user._id)
 
     setName(user.name)
     setEmail(user.email)
@@ -94,42 +85,30 @@ function Users() {
 
   
  const updateUser = async () => {
-
   try {
+    const response = await apiClient.put(
+      `/api/users/${editingId}`,
+      {
+        name,
+        email,
+        role
+      }
+    )
 
-    const response =
-      await axios.put(
+    const updatedUsers = users.map((user) => {
+      if (user._id === editingId) {
+        return response.data
+      }
 
-        `http://localhost:5000/api/users/${editingId}`,
-
-        {
-          name,
-          email,
-          role
-        }
-
-      )
-
-    const updatedUsers =
-      users.map((user) => {
-
-        if (user._id === editingId) {
-          return response.data
-        }
-
-        return user
-      })
+      return user
+    })
 
     setUsers(updatedUsers)
-
     setEditingId(null)
-
     setName('')
     setEmail('')
     setRole('Employee')
-
   } catch (error) {
-
     console.log(error)
   }
 }
@@ -294,7 +273,7 @@ function Users() {
 
                         <button
                           className="btn btn-danger btn-sm"
-                          onClick={() => deleteUser(user.id)}
+                          onClick={() => deleteUser(user._id)}
                         >
                           <FaTrash />
                         </button>
