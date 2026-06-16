@@ -93,8 +93,6 @@ router.post('/login', async (req, res) => {
   }
 })
 
-module.exports = router
-
 // Get current authenticated user
 router.get('/me', verifyToken, async (req, res) => {
   try {
@@ -104,3 +102,5 @@ router.get('/me', verifyToken, async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
+
+module.exports = router

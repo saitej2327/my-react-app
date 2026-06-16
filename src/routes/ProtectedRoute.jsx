@@ -1,18 +1,45 @@
+import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { getAuthToken } from '../api/authHelpers'
+import { clearAuthToken, getAuthToken } from '../api/authHelpers'
+import { getCurrentUser } from '../api/authService'
 
 function ProtectedRoute({ children }) {
 
-  // GET TOKEN
-  const token = getAuthToken()
+  const [loading, setLoading] = useState(true)
+  const [isValid, setIsValid] = useState(false)
 
-  // IF NO TOKEN
-  if (!token) {
+  useEffect(() => {
+    const token = getAuthToken()
 
+    if (!token) {
+      setLoading(false)
+      setIsValid(false)
+      return
+    }
+
+    const verifyToken = async () => {
+      try {
+        await getCurrentUser()
+        setIsValid(true)
+      } catch (error) {
+        clearAuthToken()
+        setIsValid(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    verifyToken()
+  }, [])
+
+  if (loading) {
+    return <div className="text-center mt-5">Verifying session...</div>
+  }
+
+  if (!isValid) {
     return <Navigate to="/" />
   }
 
-  // ACCESS GRANTED
   return children
 }
 

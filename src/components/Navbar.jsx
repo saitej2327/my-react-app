@@ -1,15 +1,11 @@
 import { useNavigate } from 'react-router-dom'
+import { clearAuthToken } from '../api/authHelpers'
 
 function Navbar() {
-
   const navigate = useNavigate()
 
   const handleLogout = () => {
-
-    // REMOVE TOKEN
-    localStorage.removeItem('token')
-
-    // REDIRECT
+    clearAuthToken()
     navigate('/')
   }
 
