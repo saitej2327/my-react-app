@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../config/apiConfig'
-import { getAuthToken } from './authHelpers'
+import { getAuthToken, clearAuthToken } from './authHelpers'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -16,5 +16,17 @@ apiClient.interceptors.request.use((config) => {
 
   return config
 })
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      clearAuthToken()
+      window.location.href = '/'
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 export default apiClient
